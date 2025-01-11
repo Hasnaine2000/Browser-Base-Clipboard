@@ -27,48 +27,46 @@
         }
 
         .header {
-    display: flex;
-    justify-content: center; 
-    align-items: center;    
-    margin-bottom: 20px;
-}
+            display: flex;
+            justify-content: space-between;
+            align-items: center;    
+            margin-bottom: 20px;
+        }
 
-.header h1 {
-    font-size: 30px;
-    text-align: center;
-    flex: 1;           
-}
-
-        
+        .header h1 {
+            font-size: 30px;
+            text-align: center;
+            flex: 1;           
+        }
 
         .btn:hover {
             background-color: #45a049;
         }
 
         .field {
-    background-color: #505050;
-    margin-bottom: 10px;
-    padding: 10px;
-    border-radius: 5px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%; 
-    box-sizing: border-box; 
-}
+            background-color: #505050;
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%; 
+            box-sizing: border-box; 
+        }
 
-.btn {
-    background-color: #4caf50;
-    color: white;
-    border: none;
-    padding: 10px; 
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 14px;
-    width: 100%; 
-    box-sizing: border-box; 
-    text-align: center;
-}
+        .btn {
+            background-color: #4caf50;
+            color: white;
+            border: none;
+            padding: 10px; 
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            width: 48%;
+            box-sizing: border-box; 
+            text-align: center;
+        }
 
         .field input {
             background-color: transparent;
@@ -116,26 +114,24 @@
     <div class="app">
         <div class="header">
             <h1>Clipboard Tool</h1>
-            
         </div>
         <div id="fieldsContainer"></div>
 
         <div class="header">
-            <h1><button class="btn" id="addButton">Add Field</button></h1>
-            
-
+            <button class="btn" id="addButton">Add Field</button>
+            <button class="btn" id="clearButton">Clear All</button>
         </div>
-        
     </div>
 
     <script>
         const fieldsContainer = document.getElementById('fieldsContainer');
         const addButton = document.getElementById('addButton');
+        const clearButton = document.getElementById('clearButton');
     
         // Load saved fields from localStorage
         function loadFields() {
             const savedFields = JSON.parse(localStorage.getItem('clipboardFields')) || [];
-            savedFields.forEach(({ text, timestamp }) => addField(text, timestamp));
+            savedFields.forEach(({ text, timestamp }) => addField(text, timestamp, true));
         }
     
         // Save fields to localStorage
@@ -161,7 +157,7 @@
         }
     
         // Add a new field
-        function addField(value = '', timestamp = formatTimestamp(new Date())) {
+        function addField(value = '', timestamp = formatTimestamp(new Date()), prepend = true) {
             const field = document.createElement('div');
             field.className = 'field';
             field.setAttribute('data-timestamp', timestamp);
@@ -171,6 +167,7 @@
             input.value = value;
             input.placeholder = 'Enter text...';
             input.addEventListener('input', saveFields);
+            input.focus(); // Auto-focus new field
     
             const timestampLabel = document.createElement('span');
             timestampLabel.textContent = timestamp;
@@ -199,15 +196,28 @@
             field.appendChild(timestampLabel);
             field.appendChild(copyButton);
             field.appendChild(removeButton);
-            fieldsContainer.prepend(field);
+    
+            // Add to the container (newest entries at the top)
+            if (prepend) {
+                fieldsContainer.insertBefore(field, fieldsContainer.firstChild);
+            } else {
+                fieldsContainer.appendChild(field);
+            }
         }
     
+        // Clear all fields
+        clearButton.addEventListener('click', () => {
+            if (confirm('Are you sure you want to clear all fields?')) {
+                fieldsContainer.innerHTML = '';
+                localStorage.removeItem('clipboardFields');
+            }
+        });
+
+        // Add field on button click
         addButton.addEventListener('click', () => addField());
     
         // Initialize fields on load
         loadFields();
     </script>
-    
-    
 </body>
 </html>
