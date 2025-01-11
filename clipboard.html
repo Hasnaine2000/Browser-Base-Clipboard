@@ -131,38 +131,60 @@
     <script>
         const fieldsContainer = document.getElementById('fieldsContainer');
         const addButton = document.getElementById('addButton');
-
+    
         // Load saved fields from localStorage
         function loadFields() {
             const savedFields = JSON.parse(localStorage.getItem('clipboardFields')) || [];
-            savedFields.forEach(text => addField(text));
+            savedFields.forEach(({ text, timestamp }) => addField(text, timestamp));
         }
-
+    
         // Save fields to localStorage
         function saveFields() {
-            const fields = Array.from(fieldsContainer.querySelectorAll('input')).map(input => input.value);
+            const fields = Array.from(fieldsContainer.querySelectorAll('.field')).map(field => {
+                const input = field.querySelector('input');
+                const timestamp = field.getAttribute('data-timestamp') || formatTimestamp(new Date());
+                return { text: input.value, timestamp };
+            });
             localStorage.setItem('clipboardFields', JSON.stringify(fields));
         }
-
+    
+        // Format timestamp (exclude seconds)
+        function formatTimestamp(date) {
+            return date.toLocaleString('en-US', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: true
+            });
+        }
+    
         // Add a new field
-        function addField(value = '') {
+        function addField(value = '', timestamp = formatTimestamp(new Date())) {
             const field = document.createElement('div');
             field.className = 'field';
-
+            field.setAttribute('data-timestamp', timestamp);
+    
             const input = document.createElement('input');
             input.type = 'text';
             input.value = value;
             input.placeholder = 'Enter text...';
             input.addEventListener('input', saveFields);
-
+    
+            const timestampLabel = document.createElement('span');
+            timestampLabel.textContent = timestamp;
+            timestampLabel.style.marginLeft = '10px';
+            timestampLabel.style.fontSize = '12px';
+            timestampLabel.style.color = '#bbb';
+    
             const copyButton = document.createElement('button');
             copyButton.className = 'copy-btn';
             copyButton.textContent = 'Copy';
             copyButton.addEventListener('click', () => {
                 navigator.clipboard.writeText(input.value);
-                
             });
-
+    
             const removeButton = document.createElement('button');
             removeButton.className = 'remove-btn';
             removeButton.textContent = 'Remove';
@@ -172,17 +194,20 @@
                     saveFields();
                 }
             });
-
+    
             field.appendChild(input);
+            field.appendChild(timestampLabel);
             field.appendChild(copyButton);
             field.appendChild(removeButton);
             fieldsContainer.prepend(field);
         }
-
+    
         addButton.addEventListener('click', () => addField());
-
+    
         // Initialize fields on load
         loadFields();
     </script>
+    
+    
 </body>
 </html>
