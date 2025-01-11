@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clipboard Tool</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #2b2b2b;
+            color: #fff;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .app {
+            background: #3b3b3b;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3), 0 4px 6px rgba(255, 255, 255, 0.1) inset;
+            width: 400px;
+            position: relative;
+            border: 2px solid #4caf50; 
+        }
+
+        .header {
+    display: flex;
+    justify-content: center; 
+    align-items: center;    
+    margin-bottom: 20px;
+}
+
+.header h1 {
+    font-size: 30px;
+    text-align: center;
+    flex: 1;           
+}
+
+        
+
+        .btn:hover {
+            background-color: #45a049;
+        }
+
+        .field {
+    background-color: #505050;
+    margin-bottom: 10px;
+    padding: 10px;
+    border-radius: 5px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%; 
+    box-sizing: border-box; 
+}
+
+.btn {
+    background-color: #4caf50;
+    color: white;
+    border: none;
+    padding: 10px; 
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    width: 100%; 
+    box-sizing: border-box; 
+    text-align: center;
+}
+
+        .field input {
+            background-color: transparent;
+            color: white;
+            border: none;
+            outline: none;
+            font-size: 14px;
+            flex-grow: 1;
+            margin-right: 10px;
+        }
+
+        .field input::placeholder {
+            color: #ccc;
+        }
+
+        .field button {
+            margin-left: 5px;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .copy-btn {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .remove-btn {
+            background-color: #e74c3c;
+            color: white;
+        }
+
+        .copy-btn:hover {
+            background-color: #0056b3;
+        }
+
+        .remove-btn:hover {
+            background-color: #c0392b;
+        }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <div class="header">
+            <h1>Clipboard Tool</h1>
+            
+        </div>
+        <div id="fieldsContainer"></div>
+
+        <div class="header">
+            <h1><button class="btn" id="addButton">Add Field</button></h1>
+            
+
+        </div>
+        
+    </div>
+
+    <script>
+        const fieldsContainer = document.getElementById('fieldsContainer');
+        const addButton = document.getElementById('addButton');
+
+        // Load saved fields from localStorage
+        function loadFields() {
+            const savedFields = JSON.parse(localStorage.getItem('clipboardFields')) || [];
+            savedFields.forEach(text => addField(text));
+        }
+
+        // Save fields to localStorage
+        function saveFields() {
+            const fields = Array.from(fieldsContainer.querySelectorAll('input')).map(input => input.value);
+            localStorage.setItem('clipboardFields', JSON.stringify(fields));
+        }
+
+        // Add a new field
+        function addField(value = '') {
+            const field = document.createElement('div');
+            field.className = 'field';
+
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.value = value;
+            input.placeholder = 'Enter text...';
+            input.addEventListener('input', saveFields);
+
+            const copyButton = document.createElement('button');
+            copyButton.className = 'copy-btn';
+            copyButton.textContent = 'Copy';
+            copyButton.addEventListener('click', () => {
+                navigator.clipboard.writeText(input.value);
+                
+            });
+
+            const removeButton = document.createElement('button');
+            removeButton.className = 'remove-btn';
+            removeButton.textContent = 'Remove';
+            removeButton.addEventListener('click', () => {
+                if (confirm('Are you sure you want to remove this field?')) {
+                    field.remove();
+                    saveFields();
+                }
+            });
+
+            field.appendChild(input);
+            field.appendChild(copyButton);
+            field.appendChild(removeButton);
+            fieldsContainer.prepend(field);
+        }
+
+        addButton.addEventListener('click', () => addField());
+
+        // Initialize fields on load
+        loadFields();
+    </script>
+</body>
+</html>
