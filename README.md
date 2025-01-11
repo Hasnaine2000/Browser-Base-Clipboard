@@ -3,7 +3,7 @@
 
  
 Clipboard softwares avaiable on the internet are versatile and have lot more options in general.
-They are quite heavy in some cases and not everyone needs all the options that the software tools offers. 
+They are quite heavy in some cases and not everyone needs all the options that the tools offers. 
 
 This simple browser based tool is very lightweight and needs just a broswer window to operate. 
 It uses local storage instead of any database software.
