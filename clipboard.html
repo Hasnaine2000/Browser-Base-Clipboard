@@ -131,17 +131,19 @@
         // Load saved fields from localStorage
         function loadFields() {
             const savedFields = JSON.parse(localStorage.getItem('clipboardFields')) || [];
-            savedFields.forEach(({ text, timestamp }) => addField(text, timestamp, true));
+            const sortedFields = savedFields.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+            sortedFields.forEach(({ text, timestamp }) => addField(text, timestamp, false));
         }
     
-        // Save fields to localStorage
+        // Save fields to localStorage in descending order of timestamps
         function saveFields() {
             const fields = Array.from(fieldsContainer.querySelectorAll('.field')).map(field => {
                 const input = field.querySelector('input');
                 const timestamp = field.getAttribute('data-timestamp') || formatTimestamp(new Date());
                 return { text: input.value, timestamp };
             });
-            localStorage.setItem('clipboardFields', JSON.stringify(fields));
+            const sortedFields = fields.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+            localStorage.setItem('clipboardFields', JSON.stringify(sortedFields));
         }
     
         // Format timestamp (exclude seconds)
